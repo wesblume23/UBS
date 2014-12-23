@@ -9,7 +9,7 @@ public class countWords implements WordFrequency
 {
   //Thread Safe map for atomic read/write
   private Map<String, Integer> map = Collections.synchronizedMap(new HashMap<String, Integer>());
-  
+  private final Object syncHelper = new Object(); // a helper object for synchrnoizing asynchronous operations
   /**
    *@Description            - Count the number of occurrences of words in a string
    *@Precondition           - Input parameter is not null or empty
@@ -36,8 +36,11 @@ public class countWords implements WordFrequency
         if (this.map.containsKey(word))
         {
           Integer frequency = this.map.get(word);
-            
-          this.map.put(word, ++frequency);
+          synchronized (syncHelper)
+          {
+            ++frequency; // incrementing is synchronized
+          }
+          this.map.put(word, frequency);
         }
         else
         {
